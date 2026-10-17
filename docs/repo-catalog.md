@@ -1,29 +1,34 @@
 # Repo 清單與責任邊界
 
-新版先以三個可獨立執行或驗證的 repo 落地。這不是原先 23 個 repo 的拆分清單，也不要求先建立一批空 repo。
+## 本批現行範圍：三個 repo
 
-| Repo | 類別 | 責任 | 本機實作狀態 |
-|---|---|---|---|
-| `ssr-chat` | 正式問答 | 輸入、來源與必要欄位驗證、觸發判定、固定 SOP、前文 snapshot、問題分析與拆分、天氣/人物/遊戲介紹/攻略/道具五類獨立查詢、Prompt 組裝、模型呼叫介面、文字輸出、事件與執行歷史 | fixture 原型；真實平台與模型未連線；dry-run 不公開發送 |
-| `ssr-knowledge` | 背景知識 | 預建候選、缺口補充候選、人工審核、版本化發布、指定版本本機讀取、固定工具準備設定 | 本機 JSON 工作流；不研究網路、不共用資料庫、不要求正式問答運行 |
-| `ssr-system-assembly` | 工程規格 | 架構、repo 邊界、契約副本、範例、落地計畫、本 repo 文件與契約驗證 | 規格與本機檢查；不啟動或測試另外兩個 repo |
+本批只交付 `ssr-chat`、`ssr-knowledge`、`ssr-system-assembly` 三個可各自執行或驗證的 repo。下表呈現目前 repo 內的功能與實作狀態；本機完成表示該本機功能有程式及單 repo 驗收，不表示連上真實 provider。
 
-## 不在這三 repo 範圍內
+| Repo | 本機功能已完成 | Fixture／stub only | 真實 provider 待決 | 明確延後（非本批缺口） |
+|---|---|---|---|---|
+| `ssr-chat` | 事件必填欄位與來源驗證、stable `message_id`、觸發與 SOP、conversation snapshot 回程、用途拆分、五類獨立 query、Prompt 組裝、原始事件與 run trace 分記、重啟去重、失敗追蹤 | 直播事件來源、天氣資料、人物／遊戲已發布知識、模型均使用 fixture；輸出為 dry-run | 直播平台輸入／輸出 adapter、正式模型與即時天氣 provider。人物／遊戲資料方向已定為自有知識加人工整理的 Wiki／網路材料；實際來源端點、授權及更新方式須在接線前決定 | 知識 bundle 跨 repo 匯入與 runtime 自動缺口交接；共用套件／服務；STT 與逐字稿查詢 |
+| `ssr-knowledge` | 離線 prebuild、缺口研究包、candidate 審核、明確版本發布與摘要驗證、固定工具 manifest 的版本化保存／讀回 | 範例材料是虛構資料；研究只接收人工提供的離線材料；API／MCP manifest 是未連線設定範本 | 允許的 Wiki／網路來源端點、授權／引用、更新頻率及自動研究 provider 尚未接通。素材方向已定，現行本機流程以自有格式及人工整理材料輸入 | 與 runtime 自動交換或共用服務；共用套件；STT |
+| `ssr-system-assembly` | 三 repo 責任文件、流程與依賴圖、契約副本、JSON 範例、本 repo schema／文件驗證器 | 範例識別碼與素材為 fixture；驗證只涵蓋本 repo | 此 repo 不連 provider | 跨 repo 交換／整合與共用套件；STT |
 
-- `ssr-data-contracts` 是既有 repo，不是新版 runtime 共用套件，也不是本地驗證器的輸入來源。新版契約副本分別留在需要它們的 repo。
-- `ssr-streamer-transcript-source` 和 `ssr-query-streamer-transcript` 是預留方向，未列為本批實作 repo。主播逐字稿需要時間戳與來源；查詢可以供「剛剛說了什麼」類問題使用。一般逐字稿不觸發回答；明確喚醒詞規則未決定。
-- 其他原藍圖模組暫作 `ssr-chat` 內部邊界或未來擴充點，不以空 repo 方式預先建立。
+### 狀態用語
 
-## 運行與依賴原則
+- **本機功能已完成**：在本 repo 的本機範圍內有實作並可由本 repo 測試或驗證器檢查。
+- **Fixture／stub only**：流程或介面存在，但資料、模型、來源或輸出是虛構 fixture、dry-run 或未連線範本。
+- **真實 provider 待決**：只有在需要直播或網路連線前，才須決定 provider、來源授權及必要連線設定；本批不含憑證或持久權限。
+- **明確延後**：不列為本批完成條件或阻塞項，只有重新排入範圍時才處理。
 
-- repo 可各自啟動、測試或離線檢查；不以「先開另一個 repo 的服務」作為成功條件。
-- 共用能力可在未來以版本化依賴或資料封裝交換；不強制共用運行服務。當前各 repo 不跨 repo 匯入、不使用檔案路徑依賴，也不要求共用資料庫。
-- 正式問答的聊天室原始事件、SOP 記錄、執行 trace、知識缺口各有用途。執行歷史以 `run_id` 連結原始 `message_id`；不是把聊天室原始事件與回答執行紀錄混成一筆。
-- 缺口匯出到背景研究的封裝及版本交換機制待決定。補充材料必須人工審核後才可發布。
-- 預建資料是否全部需要人工審核仍待決定；`ssr-knowledge` 本機先採人工審核再發布的保守預設。
+## 歷史 mapping：原 23 項藍圖名稱
 
-### 本機續作實作補充
+原始名稱只保留作歷史 mapping，不代表目前建立了 23 個 repo，也不是 23 項獨立驗收缺口。完整對照見 [historical-repo-mapping.md](historical-repo-mapping.md)。
 
-- ssr-chat 以來源、聊天室與訊息 ID 重建重複事件索引；重複到達仍記錄原始事件並進固定 SOP。執行 trace 記錄模型或輸出錯誤；模型失敗不送輸出。知識 reader 僅接受已發布、有版本的本機素材。
-- ssr-knowledge 將離線研究包、候選及已發布版本分開保存。研究包連結 gap/run/message/source，候選由研究包建立且不可繞過人工核准；發布 bundle 記錄 SHA-256 records 摘要並於查詢前重驗。
-- 上述實作各自只依賴本 repo 標準函式庫與本地 JSON/JSONL。跨 repo 交換格式、傳輸機制與部署仍未實作或決定。
+## 明確延後的兩項預留名稱
+
+`ssr-streamer-transcript-source` 與 `ssr-query-streamer-transcript` 保留為未來逐字稿來源與獨立查詢方向。兩者目前沒有輸入、保存或 query 實作；一般逐字稿不觸發回覆。它們不在本批交付或驗收條件內。
+
+## 獨立運行原則
+
+- 三 repo 可各自執行或離線驗證，不要求另一 repo 的服務先啟動。
+- 本批不建立共用 package、runtime、DB、RPC 或整合測試；此項明確延後，不阻擋三 repo 本機功能驗收。
+- 聊天原始事件、SOP、執行 trace 及知識缺口分開記錄；只有進入問答執行的事件才有 `run_id`，trace 以 `run_id` 關聯 `message_id`。
+- 缺口補充 candidate 必須經人工審核才可發布。預建資料是否也必須人工審核仍待決；本機預設採人工核准。
+- 人物／遊戲資料方向已決定為自有格式與人工整理的 Wiki／網路材料；fixture 僅供本機驗證，不代表來源或抓取 provider 已接通。

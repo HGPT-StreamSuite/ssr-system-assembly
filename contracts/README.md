@@ -1,6 +1,6 @@
 # 最小資料契約
 
-此處契約是 `ssr-system-assembly` 自己保存、自己驗證的版本化前置規格，不由 `ssr-data-contracts` 或任何 repo 套件載入。其他 repo 需要使用時，必須自行保留副本並獨立驗證；未決定跨 repo 相容與發佈機制前，不可視為共用 runtime 契約。
+此處契約是 `ssr-system-assembly` 自己保存、自己驗證的規格副本，不由任何共用套件載入。其他 repo 需要使用時，各自保留副本並獨立驗證。本批不要求發布共用契約套件或建立跨 repo runtime 依賴；共用套件與交換機制已明確延後。
 
 ## Schema 與範例
 

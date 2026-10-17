@@ -1,6 +1,6 @@
 # 架構與資料流
 
-本文件把正式問答資料流、背景知識流程、預留 STT 路徑與 repo 依賴圖分開。圖描述目標邊界；目前外部平台、正式模型、網路工具及跨 repo 交換均未連線。
+本文件把正式問答資料流、背景知識流程、明確延後的 STT 路徑與 repo 依賴圖分開。圖描述三 repo 邊界；目前外部平台、正式模型及網路 provider 未連線。跨 repo 交換／整合與 STT 已明確延後，不是本批缺口。
 
 ## 正式問答：輸入到平台文字輸出
 
@@ -56,7 +56,7 @@ flowchart LR
 
 ### 背景知識流程
 
-知識準備是獨立系統，預建、缺口研究和工具設定不要求聊天 runtime 運行，也不假設共用資料庫。查詢正式回答時使用的材料可以來自本機 fixture；未來已發布知識如何交付給 query modules，尚未決定。
+知識準備是獨立系統，預建、缺口研究和工具設定不要求聊天 runtime 運行，也不假設共用資料庫。人物／遊戲資料的來源方向已定為自有資料格式及人工整理的 Wiki／網路材料；本機只接收已整理的 JSON 與 fixture，不執行網路抓取。人物、遊戲和天氣的正式 provider 尚未連線；跨 repo 發布資料如何交付給 query modules 明確延後，不是目前 runtime 前置條件。
 
 ```mermaid
 flowchart LR
@@ -64,7 +64,7 @@ flowchart LR
     WikiSources[Wiki / 網路材料<br/>人工蒐集；本機原型不連網] --> Prebuild
     Prebuild --> PreCandidate[預建候選]
 
-    GapExport[問答缺口匯出<br/>run_id + message_id] -. 未決定的版本化交換 .-> GapImport[背景匯入缺口]
+    GapExport[問答缺口匯出<br/>run_id + message_id] -. 明確延後；不屬本批 .-> GapImport[背景匯入缺口]
     GapImport --> Research[另行研究、補來源]
     Research --> GapCandidate[缺口補充候選]
 
@@ -75,14 +75,14 @@ flowchart LR
     PreCandidate --> CandidateStore
     GapCandidate --> CandidateStore
     Publish --> Versioned[版本化知識封裝<br/>本機 JSON 原型]
-    Versioned -. 交付/匯入方式待決定 .-> QueryModules[未來由查詢模組讀取<br/>非共享服務依賴]
+    Versioned -. 明確延後；不要求 runtime 交接 .-> QueryModules[未來由查詢模組讀取<br/>非共享服務依賴]
 
-    ToolSources[固定用途工具清單] --> ToolPrep[工具設定準備<br/>僅文件與 fixture]
+    ToolSources[固定用途工具清單] --> ToolPrep[本機版本化工具 manifest<br/>不連線]
 ```
 
-缺口補充候選必須人工審核後才能發布。預建內容是否一律人工審核尚待決定；本機原型先採人工審核的保守預設。工具設定目前只記錄用途，不執行工具、不儲存金鑰。版本封裝、匯入操作、相容政策和撤回方式未決定。
+缺口補充候選必須人工審核後才能發布。預建內容是否一律人工審核尚待決定；本機原型先採人工審核的保守預設。工具設定可在本機保存及讀回不可變版本 manifest，內容列 adapter kind、介面版本、參數和輸出；provider 仍 undecided，network disabled，不執行工具也不儲存金鑰。跨 repo 版本封裝、匯入與相容政策已明確延後。
 
-## 預留 STT 資料路徑（尚未實作）
+## 明確延後：STT 資料路徑（尚未實作）
 
 ```mermaid
 flowchart LR
@@ -96,7 +96,7 @@ flowchart LR
     WakeWord[未來可能的明確喚醒詞] -. 規則待決 .-> TranscriptQuery
 ```
 
-預留資料至少帶逐字稿來源與起訖時間。一般逐字稿只可保存/查詢，不會觸發回覆；明確喚醒詞、保留政策、來源及實作 repo 都待決定。此圖不是當前運行路徑。
+若未來重新排入，逐字稿資料需帶來源與起訖時間；一般逐字稿不觸發回覆。喚醒詞、保留政策、來源及實作 repo 屆時再決定。此圖不是當前運行路徑，也不屬本批完成條件。
 
 ## 純 repo 依賴圖
 
@@ -125,6 +125,6 @@ flowchart TB
     end
 ```
 
-三個 repo 之間沒有 import、檔案路徑、共用 runtime 或 DB 依賴。能力日後如需共用，使用已核准的版本化套件或資料封裝，不因此要求共用運行服務。契約副本獨立維護；修改時需在各 repo 各自更新和驗證。
+三個 repo 之間沒有 import、檔案路徑、共用 runtime 或 DB 依賴。本批不建立共享套件、資料封裝或整合服務；若日後使用者重新排入共用能力，再決定版本化依賴，不因此要求共用運行服務。契約副本獨立維護；修改時需在各 repo 各自更新和驗證。
 
 本機延伸的去重、模型／輸出失敗路徑，以及研究包與發布完整性流程，另見 [local-extension-acceptance.md](local-extension-acceptance.md)。流程圖與 repo 純依賴圖仍分開呈現。
