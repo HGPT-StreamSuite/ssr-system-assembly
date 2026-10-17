@@ -1,50 +1,23 @@
-# 分階段落地計畫
+# 分階段落地與驗收狀態
 
-這是依賴關係和可獨立驗證性排序的提案。首批兩個文件 repo 已在 `HGPT-StreamSuite` 以 Public、`main` 發布；其餘 repo 仍照階段安排決定實際建置細節，目前沒有啟動服務或連接平台。
+前三階段以三個 repo 分別完成本機功能。每階段都由所在 repo 單獨測試或驗證，不需要啟動另一 repo。
 
-## 階段 0：本機契約與系統藍圖（本次）
+| 階段 | Repo | 交付 | 本批狀態與驗收 |
+|---|---|---|---|
+| 0. 本機骨架 | 三 repo 各自 | README、repo 自有契約副本、fixture、忽略本機狀態檔 | 完成；使用標準函式庫和 repo 本機檔案，未新增服務或憑證 |
+| 1. 問答主線 | `ssr-chat` | 欄位／來源驗證、觸發與 SOP、前文 snapshot 回程、用途拆分、五類查詢、Prompt、fixture model、dry-run、分開記錄事件／trace／缺口 | 本機功能已完成並由本 repo 測試；資料與 provider 仍為 fixture/stub |
+| 2. 背景知識 | `ssr-knowledge` | 離線 prebuild、缺口研究包、candidate 審核、版本化發布與摘要驗證、固定工具 manifest 保存／讀回 | 本機 workflow 已完成並由本 repo 測試；研究接收人工整理材料，不自動連網 |
+| 3. 架構與契約檢查 | `ssr-system-assembly` | 三 repo 功能／狀態目錄、流程與依賴圖、最小契約、JSON 範例、provider 決策、單 repo 驗證器 | 本機文件與驗證已完成；驗證器只讀本 repo |
+| 4. 真實 provider | 按需擴充對應 repo | 直播平台、正式模型、即時天氣或經授權的材料來源 adapter | 待決策；先選必要 provider 與授權，再逐項實作及驗證。不屬於目前本機完成的宣稱 |
+| 明確延後：跨 repo 交換／整合 | 另行排入時再定 | gap/bundle 匯出匯入、共享套件或跨 repo runtime | 本批不要求、不實作、不阻塞三 repo 本機驗收 |
+| 明確延後：STT | 另行排入時再定 | 主播逐字稿來源、時間範圍查詢與喚醒詞 | 本批僅留契約方向，不實作、不阻塞三 repo 本機驗收 |
 
-- 產出 `ssr-data-contracts` 與 `ssr-system-assembly` 兩個獨立本機草稿。
-- 以 JSON Schema 與虛構範例固定第一版輸入、路由、前文、查詢、Prompt 和 run-record 形狀。
-- 驗證範例和圖示的一致性；記錄尚未授權的外部選擇。
-- 完成條件：檔案可獨立閱讀，檢查命令可離線執行；首批兩 repo 已公開，其餘藍圖 repo 未建立且沒有服務部署。
+## 本機功能驗收依據
 
-## 階段 1：固定邊界與介面
+1. `ssr-chat` 驗證 invalid／未觸發／自身事件進 SOP；穩定 `message_id` 缺漏會拒絕；snapshot 同時供分析和 Prompt；各用途 query 使用獨立文字；原始事件與 `run_id` trace 分開保存；模型失敗不呼叫輸出。
+2. `ssr-knowledge` 分別驗證本機 prebuild、離線 gap packet、candidate 人工審核、明確版本發布及摘要重驗、固定工具 manifest 版本化保存／讀回。缺口研究不要求 `ssr-chat` 運行。
+3. `ssr-system-assembly` 驗證本 repo 自有 schemas、examples、文件與 repo 清單；不匯入或啟動另外兩 repo。
 
-- 審閱第一版資料契約及 ID、路由狀態、查詢狀態語意。
-- 首批兩 repo 的 Public 可見性與 `main` 已決定；為其餘 repo 決定可見性、建立順序與版本套件發布方式。
-- 定義平台接入、來源信任規則、缺口紀錄欄位、執行歷史持久化責任。
-- 完成條件：跨 repo 呼叫輸入輸出能用範例互通，所有外部服務仍可替換。
+## 真實 provider 前需要決定
 
-## 階段 2：獨立接入和 SOP 最小垂直切片
-
-- 實作 chat-input、event-sop、conversation-store、conversation-context 的本地替身或可獨立測試元件。
-- 確認無效事件與未觸發事件都留下可追蹤的 SOP 記錄。
-- 確認 `run_id` 僅連結適用的 `message_id`，原始事件與執行歷史分離。
-- 完成條件：不用真實模型即可驗證輸入、路由與前文 snapshot 往返。
-
-## 階段 3：查詢素材與 Prompt 組裝
-
-- 實作 question-analysis、answer-context 和五個分離 query repo 的契約 adapter。
-- 先用固定 fixture 驗證多需求分流；每個查詢回素材、來源和狀態。
-- 確認 conversation-context 回傳的同一 snapshot 同時進分析和 Prompt 組裝。
-- 完成條件：每個素材和來源可追溯，缺資料可留下缺口記錄。
-
-## 階段 4：模型及平台輸出整合
-
-- 在平台、模型與來源選擇獲核定後實作 adapters、model-client、runtime、chat-output。
-- 加入錯誤處理、輸出安全政策與端到端觀測方式；細節需另行決定。
-- 完成條件：在明確選定的測試環境端到端驗證，而非以本地 schema 通過代替。
-
-## 階段 5：背景知識建置與發布
-
-- 實作 research、build、candidate-store、review、publish 的獨立流程。
-- 以版本化發布材料供正式 reader 使用；缺口補充經人工審核後發布。
-- 另行決定初次預建庫是否需審核，以及正式缺口匯出如何交背景研究。
-- 完成條件：研究、審核、發布與正式讀取能用已發布版本獨立驗證。
-
-## 階段 6：STT 預留能力（非目前範圍）
-
-- 主播逐字稿若要支援，另行建立 source 入庫與 transcript query repo。
-- 逐字稿帶時間及來源；一般逐字稿不觸發回答，任何明確喚醒詞規則另行核定。
-- 此階段未實作、未建 repo、未列入前 23 個 repo。
+先後只需決定要啟用的直播平台、正式模型，以及需要即時天氣時的 provider。人物／遊戲來源方向已定為自有資料格式及人工整理的 Wiki／網路材料；只有要開啟網路讀取或自動研究時，才需確定端點、授權／引用與更新規則。

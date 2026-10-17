@@ -1,52 +1,34 @@
 # Repo 清單與責任邊界
 
-狀態欄代表落地進度：**首批已公開**表示 repo 已在 `HGPT-StreamSuite` 以 Public、`main` 建立；**藍圖**代表只列入系統規劃，尚未建立 repo。名稱與 repo 數以核心 23 個為準，兩個 STT repo 另列為預留項目。
+## 本批現行範圍：三個 repo
 
-## 正式問答系統（14）
+本批只交付 `ssr-chat`、`ssr-knowledge`、`ssr-system-assembly` 三個可各自執行或驗證的 repo。下表呈現目前 repo 內的功能與實作狀態；本機完成表示該本機功能有程式及單 repo 驗收，不表示連上真實 provider。
 
-| Repo | 責任邊界 | 狀態 |
-|---|---|---|
-| `ssr-chat-input` | 接收平台文字事件、標準化輸入、必要欄位及來源驗證，保留無效輸入送 SOP。 | 藍圖 |
-| `ssr-chat-runtime` | 控制觸發、SOP 路由、前文讀取、分析、查詢、Prompt、模型和輸出的單次流程；建立問答 `run_id` 與獨立執行歷史記錄。 | 藍圖 |
-| `ssr-question-analysis` | 判斷問題意圖、拆分多需求，為每個需求指定獨立查詢用途。 | 藍圖 |
-| `ssr-conversation-context` | runtime 呼叫此元件；讀取 `conversation-store` 並回傳前文快照。 | 藍圖 |
-| `ssr-answer-context` | 組合分析、各查詢素材與 runtime 傳入的同一前文快照，產生模型 Prompt 輸入。 | 藍圖 |
-| `ssr-chat-output` | 將完成的文字交回平台 adapter；不負責查詢或生成答案。 | 藍圖 |
-| `ssr-conversation-store` | 儲存／讀取原始聊天室事件，供 context 建立快照。 | 藍圖 |
-| `ssr-event-sop` | 接收無效事件與有效但未觸發事件，依固定 SOP 處理，不靜默丟棄。 | 藍圖 |
-| `ssr-knowledge-reader` | 將已發布、版本化知識轉為查詢可用素材；發布儲存／讀取機制待定。 | 藍圖 |
-| `ssr-query-weather` | 獨立處理天氣需求，僅回素材、來源與狀態。 | 藍圖 |
-| `ssr-query-person` | 獨立處理人物需求，僅回素材、來源與狀態。 | 藍圖 |
-| `ssr-query-game-info` | 獨立處理遊戲介紹需求，僅回素材、來源與狀態。 | 藍圖 |
-| `ssr-query-game-guide` | 獨立處理遊戲攻略需求，僅回素材、來源與狀態。 | 藍圖 |
-| `ssr-query-game-item` | 獨立處理道具需求，僅回素材、來源與狀態。 | 藍圖 |
+| Repo | 本機功能已完成 | Fixture／stub only | 真實 provider 待決 | 明確延後（非本批缺口） |
+|---|---|---|---|---|
+| `ssr-chat` | 事件必填欄位與來源驗證、stable `message_id`、觸發與 SOP、conversation snapshot 回程、用途拆分、五類獨立 query、Prompt 組裝、原始事件與 run trace 分記、重啟去重、失敗追蹤 | 直播事件來源、天氣資料、人物／遊戲已發布知識、模型均使用 fixture；輸出為 dry-run | 直播平台輸入／輸出 adapter、正式模型與即時天氣 provider。人物／遊戲資料方向已定為自有知識加人工整理的 Wiki／網路材料；實際來源端點、授權及更新方式須在接線前決定 | 知識 bundle 跨 repo 匯入與 runtime 自動缺口交接；共用套件／服務；STT 與逐字稿查詢 |
+| `ssr-knowledge` | 離線 prebuild、缺口研究包、candidate 審核、明確版本發布與摘要驗證、固定工具 manifest 的版本化保存／讀回 | 範例材料是虛構資料；研究只接收人工提供的離線材料；API／MCP manifest 是未連線設定範本 | 允許的 Wiki／網路來源端點、授權／引用、更新頻率及自動研究 provider 尚未接通。素材方向已定，現行本機流程以自有格式及人工整理材料輸入 | 與 runtime 自動交換或共用服務；共用套件；STT |
+| `ssr-system-assembly` | 三 repo 責任文件、流程與依賴圖、契約副本、JSON 範例、本 repo schema／文件驗證器 | 範例識別碼與素材為 fixture；驗證只涵蓋本 repo | 此 repo 不連 provider | 跨 repo 交換／整合與共用套件；STT |
 
-## 背景知識準備系統（5）
+### 狀態用語
 
-此系統獨立研究、整理及發布知識；正式問答缺資料時可留待處理的缺口，並透過尚未決定的匯出／匯入機制交背景研究。正式問答不需要背景系統運行，背景作業也不要求正式問答運行。
+- **本機功能已完成**：在本 repo 的本機範圍內有實作並可由本 repo 測試或驗證器檢查。
+- **Fixture／stub only**：流程或介面存在，但資料、模型、來源或輸出是虛構 fixture、dry-run 或未連線範本。
+- **真實 provider 待決**：只有在需要直播或網路連線前，才須決定 provider、來源授權及必要連線設定；本批不含憑證或持久權限。
+- **明確延後**：不列為本批完成條件或阻塞項，只有重新排入範圍時才處理。
 
-| Repo | 責任邊界 | 狀態 |
-|---|---|---|
-| `ssr-knowledge-build` | 按道具、功能與攻略等目錄，整理 Wiki／網路材料成為候選知識。 | 藍圖 |
-| `ssr-knowledge-research` | 蒐集材料、追查正式查詢留下的資料缺口。 | 藍圖 |
-| `ssr-knowledge-review` | 對缺口補充進行人工審核；初次大批預建庫是否需同樣審核尚未決定。 | 藍圖 |
-| `ssr-knowledge-publish` | 發布通過審核的版本化知識。 | 藍圖 |
-| `ssr-candidate-store` | 保存整理中、尚未發布的候選材料；存放機制未選定。 | 藍圖 |
+## 歷史 mapping：原 23 項藍圖名稱
 
-## 工程共用（4）
+原始名稱只保留作歷史 mapping，不代表目前建立了 23 個 repo，也不是 23 項獨立驗收缺口。完整對照見 [historical-repo-mapping.md](historical-repo-mapping.md)。
 
-| Repo | 責任邊界 | 狀態 |
-|---|---|---|
-| `ssr-model-client` | 封裝模型呼叫；供應商、API、重試及安全政策待定。 | 藍圖 |
-| `ssr-tool-adapters` | 封裝平台、網路來源與其他工具的 adapter；平台與協定待定。 | 藍圖 |
-| `ssr-data-contracts` | 共用且版本化的資料契約、schema、範例與驗證；不提供執行服務。 | 首批已公開 |
-| `ssr-system-assembly` | 保存 repo 藍圖、流程、版本相容組合及落地計畫；不提供執行服務。 | 首批已公開 |
+## 明確延後的兩項預留名稱
 
-## 預留（不計入 23 個）
+`ssr-streamer-transcript-source` 與 `ssr-query-streamer-transcript` 保留為未來逐字稿來源與獨立查詢方向。兩者目前沒有輸入、保存或 query 實作；一般逐字稿不觸發回覆。它們不在本批交付或驗收條件內。
 
-| Repo | 預留用途 | 狀態 |
-|---|---|---|
-| `ssr-streamer-transcript-source` | 未來主播逐字稿含時間與來源入庫。 | 未實作、未建立 |
-| `ssr-query-streamer-transcript` | 未來獨立查詢「剛剛說了什麼」等逐字稿需求。一般逐字稿不觸發問答；明確喚醒詞若採用須另行設計。 | 未實作、未建立 |
+## 獨立運行原則
 
-共用能力透過版本化依賴共享契約，不代表共用資料庫或常駐服務。原始聊天室事件與問答執行歷史分開記錄，`run_id` 連結 `message_id`；執行記錄由 runtime 邏輯產生，實際持久化位置與技術待定。
+- 三 repo 可各自執行或離線驗證，不要求另一 repo 的服務先啟動。
+- 本批不建立共用 package、runtime、DB、RPC 或整合測試；此項明確延後，不阻擋三 repo 本機功能驗收。
+- 聊天原始事件、SOP、執行 trace 及知識缺口分開記錄；只有進入問答執行的事件才有 `run_id`，trace 以 `run_id` 關聯 `message_id`。
+- 缺口補充 candidate 必須經人工審核才可發布。預建資料是否也必須人工審核仍待決；本機預設採人工核准。
+- 人物／遊戲資料方向已決定為自有格式與人工整理的 Wiki／網路材料；fixture 僅供本機驗證，不代表來源或抓取 provider 已接通。

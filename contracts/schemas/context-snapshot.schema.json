@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Conversation context snapshot",
+  "type": "object",
+  "required": ["snapshot_id", "conversation_id", "messages"],
+  "properties": {
+    "snapshot_id": {"type": "string"},
+    "conversation_id": {"type": "string"},
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["message_id", "author_id", "text", "created_at"],
+        "properties": {
+          "message_id": {"type": "string"},
+          "author_id": {"type": "string"},
+          "text": {"type": "string"},
+          "created_at": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

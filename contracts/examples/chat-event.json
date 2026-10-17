@@ -1,0 +1,9 @@
+{
+  "message_id": "message-001",
+  "conversation_id": "room-001",
+  "author_id": "viewer-001",
+  "source": "local-fixture",
+  "text": "!ask \u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f",
+  "created_at": "2026-10-17T12:00:00Z",
+  "is_self": false
+}

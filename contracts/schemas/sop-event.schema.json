@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fixed SOP event",
+  "type": "object",
+  "required": ["sop_id", "reason", "raw_event", "created_at"],
+  "properties": {
+    "sop_id": {"type": "string"},
+    "message_id": {"type": ["string", "null"]},
+    "reason": {"type": "string"},
+    "raw_event": {"type": "object"},
+    "created_at": {"type": "string"}
+  },
+  "additionalProperties": false
+}

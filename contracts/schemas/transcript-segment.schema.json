@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reserved streamer transcript segment",
+  "type": "object",
+  "required": ["implementation_status", "segment_id", "transcript_id", "speaker_id", "text", "start_time", "end_time", "source"],
+  "properties": {
+    "implementation_status": {"type": "string", "enum": ["reserved_not_implemented"]},
+    "segment_id": {"type": "string"},
+    "transcript_id": {"type": "string"},
+    "speaker_id": {"type": "string"},
+    "text": {"type": "string"},
+    "start_time": {"type": "string"},
+    "end_time": {"type": "string"},
+    "source": {
+      "type": "object",
+      "required": ["source_id", "source_type", "locator"],
+      "properties": {
+        "source_id": {"type": "string"},
+        "source_type": {"type": "string"},
+        "locator": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

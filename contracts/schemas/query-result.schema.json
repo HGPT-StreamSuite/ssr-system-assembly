@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Purpose query result",
+  "type": "object",
+  "required": ["status", "materials", "sources"],
+  "properties": {
+    "status": {"type": "string", "enum": ["ok", "no_data", "tool_error", "unavailable"]},
+    "materials": {"type": "array", "items": {"type": "object"}},
+    "sources": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

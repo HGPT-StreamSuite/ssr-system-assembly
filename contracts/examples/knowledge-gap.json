@@ -1,0 +1,9 @@
+{
+  "gap_id": "gap-001",
+  "run_id": "run-001",
+  "message_id": "message-001",
+  "purpose": "game_item",
+  "question": "\u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f",
+  "reason": "knowledge_gap",
+  "created_at": "2026-10-17T12:00:01Z"
+}
