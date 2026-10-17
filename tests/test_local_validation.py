@@ -33,6 +33,25 @@ class LocalAssemblyValidationTests(unittest.TestCase):
         errors = validate_document(example, schema)
         self.assertTrue(any("additional property is not allowed" in error for error in errors))
 
+    def test_run_trace_covers_model_failure_without_output(self) -> None:
+        schema = load_json(ROOT / "contracts" / "schemas" / "run-trace.schema.json")
+        example = load_json(ROOT / "contracts" / "examples" / "run-trace.json")
+        example["run_status"] = "model_error"
+        example["answer"] = None
+        example["send_result"] = {
+            "status": "not_attempted",
+            "attempted": False,
+            "public_reply": False,
+            "delivery_state": "confirmed_not_sent",
+            "message_id": example["message_id"],
+            "run_id": example["run_id"],
+        }
+        self.assertEqual(validate_document(example, schema), [])
+
+        example["send_result"].pop("delivery_state")
+        errors = validate_document(example, schema)
+        self.assertTrue(any("delivery_state: required" in error for error in errors))
+
 
 if __name__ == "__main__":
     unittest.main()

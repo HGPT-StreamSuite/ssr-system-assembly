@@ -126,3 +126,5 @@ flowchart TB
 ```
 
 三個 repo 之間沒有 import、檔案路徑、共用 runtime 或 DB 依賴。能力日後如需共用，使用已核准的版本化套件或資料封裝，不因此要求共用運行服務。契約副本獨立維護；修改時需在各 repo 各自更新和驗證。
+
+本機延伸的去重、模型／輸出失敗路徑，以及研究包與發布完整性流程，另見 [local-extension-acceptance.md](local-extension-acceptance.md)。流程圖與 repo 純依賴圖仍分開呈現。

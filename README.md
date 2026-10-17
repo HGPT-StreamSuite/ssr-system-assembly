@@ -32,3 +32,6 @@ python -m unittest discover -s tests -v
 ## 狀態
 
 文件與範例是目標設計，不是已連接的真實直播平台、外部模型、網路搜尋、天氣服務或正式持久化系統。所有範例識別碼與素材都是虛構資料；STT 只保留契約草案，未實作。任何真實平台輸出或正式部署都尚未完成。
+
+## 補充驗收
+本機去重、錯誤追蹤與獨立知識研究包契約見 [docs/local-extension-acceptance.md](docs/local-extension-acceptance.md)。

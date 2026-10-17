@@ -99,3 +99,10 @@ Schema 使用 JSON Schema 2020-12 常用結構。本 repo 標準函式庫驗證�
 ```
 
 此 STT 範例不會進入目前觸發路徑。一般逐字稿只作背景查詢資料；未來是否支援明確喚醒詞仍待決定。
+
+## 續作補充契約
+
+- schemas/run-trace.schema.json 記錄 run_status、attempted、public_reply 與 delivery_state。輸出失敗無法判定是否已收件時，使用 delivery_state=unknown；模型失敗時 answer 為 null 且輸出為 not_attempted。
+- schemas/research-packet.schema.json 與 examples/research-packet.json 表示獨立離線研究包，保存 gap/run/message 關聯及素材來源。此契約不代表背景與正式問答共用資料庫或互相要求運行。
+- 已發布素材帶明確版本與 SHA-256 records 摘要；讀取端必須驗證發布狀態與摘要。摘要是完整性檢查，不是簽章或來源真實性證明。
+- 完整本地流程與失敗路徑見 [local-extension-acceptance.md](../docs/local-extension-acceptance.md)。

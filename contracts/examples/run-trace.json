@@ -2,11 +2,20 @@
   "run_id": "run-001",
   "message_id": "message-001",
   "context_snapshot_id": "snapshot-001",
+  "run_status": "completed",
   "analysis": {"intents": ["game_item"], "query_text": "\u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f"},
   "queries": [
     {"status": "no_data", "materials": [], "sources": []}
   ],
   "diagnostics": [],
   "answer": "\u76ee\u524d\u6c92\u6709\u8db3\u5920\u7684\u5df2\u767c\u5e03\u6750\u6599\u3002",
-  "send_result": {"status": "dry_run_not_sent", "public_reply": false}
+  "send_result": {
+    "status": "dry_run_not_sent",
+    "attempted": false,
+    "public_reply": false,
+    "delivery_state": "confirmed_not_sent",
+    "message_id": "message-001",
+    "run_id": "run-001"
+  },
+  "completed_at": "2026-10-17T12:00:01Z"
 }

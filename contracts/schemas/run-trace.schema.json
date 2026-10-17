@@ -2,16 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Question execution trace",
   "type": "object",
-  "required": ["run_id", "message_id", "context_snapshot_id", "analysis", "queries", "diagnostics", "answer", "send_result"],
+  "required": ["run_id", "message_id", "context_snapshot_id", "run_status", "analysis", "queries", "diagnostics", "answer", "send_result", "completed_at"],
   "properties": {
     "run_id": {"type": "string"},
     "message_id": {"type": "string"},
     "context_snapshot_id": {"type": "string"},
+    "run_status": {"type": "string", "enum": ["completed", "model_error", "output_error"]},
     "analysis": {"type": "object"},
     "queries": {"type": "array", "items": {"type": "object"}},
     "diagnostics": {"type": "array", "items": {"type": "object"}},
-    "answer": {"type": "string"},
-    "send_result": {"type": "object"}
+    "answer": {"type": ["string", "null"]},
+    "send_result": {
+      "type": "object",
+      "required": ["status", "attempted", "public_reply", "delivery_state", "message_id", "run_id"],
+      "properties": {
+        "status": {"type": "string", "enum": ["sent", "dry_run_not_sent", "not_attempted", "output_error"]},
+        "attempted": {"type": "boolean"},
+        "public_reply": {"type": "boolean"},
+        "delivery_state": {"type": "string", "enum": ["confirmed_sent", "confirmed_not_sent", "unknown"]},
+        "message_id": {"type": "string"},
+        "run_id": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "completed_at": {"type": "string"}
   },
   "additionalProperties": false
 }
