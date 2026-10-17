@@ -1,50 +1,21 @@
 # 分階段落地計畫
 
-這是依賴關係和可獨立驗證性排序的提案。首批兩個文件 repo 已在 `HGPT-StreamSuite` 以 Public、`main` 發布；其餘 repo 仍照階段安排決定實際建置細節，目前沒有啟動服務或連接平台。
+工作以 repo 為單位進行；每個階段都能在單一 repo 內驗證，不需要跨 repo 啟動或測試。
 
-## 階段 0：本機契約與系統藍圖（本次）
+| 階段 | Repo | 交付 | 驗收方式 |
+|---|---|---|---|
+| 0. 本機骨架 | 三 repo 各自 | Python/標準函式庫或 repo 既有方式；本 repo 自有 fixture、契約副本、README、忽略本機狀態檔 | 各 repo 只檢查自己，不安裝新持久服務或憑證 |
+| 1. 問答主線 | `ssr-chat` | 欄位與來源驗證、觸發判定、SOP、前文完整回程、快照共用、問題拆分、五類查詢、Prompt、模型 fixture、dry-run 輸出、分離的原始事件/trace/缺口記錄 | `ssr-chat` 內測試 fixture 事件；檢查 run/message 關聯、snapshot、查詢結果回 Prompt、無公開發送 |
+| 2. 背景知識 | `ssr-knowledge` | 本機預建和缺口補充候選、獨立固定工具設定、人工審核、版本化發布及指定版本讀取 | `ssr-knowledge` 內測試；候選未審核不能發布；讀取只回素材、來源、狀態 |
+| 3. 規格核對 | `ssr-system-assembly` | 大框架、流程與依賴分圖、最小契約、JSON 範例、決策清單、階段驗收 | 只跑本 repo 的 schema/example/docs 一致性檢查 |
+| 4. 交換設計 | 依決策再定 | 決定缺口匯出格式、知識版本封裝/匯入、相容策略及人工操作邊界 | 先完成設計與人工審查；不預設直接 RPC 或共享 DB |
+| 5. 外部連接 | 依逐項授權再定 | 平台、正式模型、即時天氣或其他外部工具 adapter | 逐 repo、逐服務確認權限與安全；不得從 fixture 測試推定已連通 |
+| 6. STT 預留功能 | 未來另行排程 | 主播逐字稿來源、時間範圍查詢、喚醒詞規則 | 先決定逐字稿來源、保存與觸發政策；目前不實作語音或轉錄 |
 
-- 產出 `ssr-data-contracts` 與 `ssr-system-assembly` 兩個獨立本機草稿。
-- 以 JSON Schema 與虛構範例固定第一版輸入、路由、前文、查詢、Prompt 和 run-record 形狀。
-- 驗證範例和圖示的一致性；記錄尚未授權的外部選擇。
-- 完成條件：檔案可獨立閱讀，檢查命令可離線執行；首批兩 repo 已公開，其餘藍圖 repo 未建立且沒有服務部署。
+## 建議的本機迭代順序
 
-## 階段 1：固定邊界與介面
-
-- 審閱第一版資料契約及 ID、路由狀態、查詢狀態語意。
-- 首批兩 repo 的 Public 可見性與 `main` 已決定；為其餘 repo 決定可見性、建立順序與版本套件發布方式。
-- 定義平台接入、來源信任規則、缺口紀錄欄位、執行歷史持久化責任。
-- 完成條件：跨 repo 呼叫輸入輸出能用範例互通，所有外部服務仍可替換。
-
-## 階段 2：獨立接入和 SOP 最小垂直切片
-
-- 實作 chat-input、event-sop、conversation-store、conversation-context 的本地替身或可獨立測試元件。
-- 確認無效事件與未觸發事件都留下可追蹤的 SOP 記錄。
-- 確認 `run_id` 僅連結適用的 `message_id`，原始事件與執行歷史分離。
-- 完成條件：不用真實模型即可驗證輸入、路由與前文 snapshot 往返。
-
-## 階段 3：查詢素材與 Prompt 組裝
-
-- 實作 question-analysis、answer-context 和五個分離 query repo 的契約 adapter。
-- 先用固定 fixture 驗證多需求分流；每個查詢回素材、來源和狀態。
-- 確認 conversation-context 回傳的同一 snapshot 同時進分析和 Prompt 組裝。
-- 完成條件：每個素材和來源可追溯，缺資料可留下缺口記錄。
-
-## 階段 4：模型及平台輸出整合
-
-- 在平台、模型與來源選擇獲核定後實作 adapters、model-client、runtime、chat-output。
-- 加入錯誤處理、輸出安全政策與端到端觀測方式；細節需另行決定。
-- 完成條件：在明確選定的測試環境端到端驗證，而非以本地 schema 通過代替。
-
-## 階段 5：背景知識建置與發布
-
-- 實作 research、build、candidate-store、review、publish 的獨立流程。
-- 以版本化發布材料供正式 reader 使用；缺口補充經人工審核後發布。
-- 另行決定初次預建庫是否需審核，以及正式缺口匯出如何交背景研究。
-- 完成條件：研究、審核、發布與正式讀取能用已發布版本獨立驗證。
-
-## 階段 6：STT 預留能力（非目前範圍）
-
-- 主播逐字稿若要支援，另行建立 source 入庫與 transcript query repo。
-- 逐字稿帶時間及來源；一般逐字稿不觸發回答，任何明確喚醒詞規則另行核定。
-- 此階段未實作、未建 repo、未列入前 23 個 repo。
+1. 在 `ssr-chat` 先通過欄位與來源驗證，再驗證有效觸發與 SOP 事件都被記錄。
+2. 驗證 Runtime 呼叫 conversation-context、context 從 conversation-store 讀取並回傳同一 snapshot；分析與 Prompt 必須收到同一 snapshot。
+3. 使用五個用途獨立查詢；每個結果只含素材、來源、狀態。缺口寫成可匯出的記錄，不在回答階段代替背景研究。
+4. 在 `ssr-knowledge` 分別驗證預建候選、缺口候選與固定工具設定；研究與發布流程不要求 `ssr-chat` 同時運行。
+5. 只有在版本封裝與人工操作方式決定後，才設計可重複的資料匯入或自動化連接；逐步避免形成無意間的跨 repo runtime 耦合。

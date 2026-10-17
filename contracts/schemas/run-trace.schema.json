@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question execution trace",
+  "type": "object",
+  "required": ["run_id", "message_id", "context_snapshot_id", "analysis", "queries", "diagnostics", "answer", "send_result"],
+  "properties": {
+    "run_id": {"type": "string"},
+    "message_id": {"type": "string"},
+    "context_snapshot_id": {"type": "string"},
+    "analysis": {"type": "object"},
+    "queries": {"type": "array", "items": {"type": "object"}},
+    "diagnostics": {"type": "array", "items": {"type": "object"}},
+    "answer": {"type": "string"},
+    "send_result": {"type": "object"}
+  },
+  "additionalProperties": false
+}

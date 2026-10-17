@@ -1,0 +1,12 @@
+{
+  "snapshot_id": "snapshot-001",
+  "conversation_id": "room-001",
+  "messages": [
+    {
+      "message_id": "message-000",
+      "author_id": "viewer-002",
+      "text": "\u554f\u4e00\u4e0b\u661f\u7802\u7528\u9014",
+      "created_at": "2026-10-17T11:59:00Z"
+    }
+  ]
+}

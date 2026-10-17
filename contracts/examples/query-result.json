@@ -1,0 +1,9 @@
+{
+  "status": "ok",
+  "materials": [
+    {"title": "\u865b\u69cb\u6e2c\u8a66\u8cc7\u6599", "text": "\u661f\u7802\u53ef\u88fd\u4f5c\u5c0f\u9053\u5177\u3002"}
+  ],
+  "sources": [
+    {"source_id": "fixture-wiki", "name": "\u672c\u6a5f fixture", "locator": "fixture://wiki/item"}
+  ]
+}

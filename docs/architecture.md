@@ -1,133 +1,128 @@
-# 架構草圖
+# 架構與資料流
 
-本文件分開描述資料流、背景知識流與版本化 repo 依賴。圖示是目標設計，沒有代表現有平台或服務已完成部署。
+本文件把正式問答資料流、背景知識流程、預留 STT 路徑與 repo 依賴圖分開。圖描述目標邊界；目前外部平台、正式模型、網路工具及跨 repo 交換均未連線。
 
-## 正式問答資料流
+## 正式問答：輸入到平台文字輸出
 
-```mermaid
-flowchart LR
-  Platform[直播平台文字事件] --> Input[ssr-chat-input\n建立 ingest-attempt]
-  Input --> Validation{必要欄位／來源驗證}
-  Validation -->|保存原始輸入與驗證結果| Store[ssr-conversation-store]
-  Validation -->|無效| SOP[ssr-event-sop\n固定 SOP]
-  Validation -->|有效標準事件| Runtime[ssr-chat-runtime\n觸發判定／流程控制]
-  Runtime -->|有效但未觸發| SOP
-  Runtime -->|觸發：建立 run_id → message_id| RunHistory[問答執行歷史\n持久化位置待定]
-  Runtime -->|呼叫前文| Context[ssr-conversation-context]
-  Context -->|讀取原始聊天事件| Store
-  Store -->|前文事件| Context
-  Context -->|同一份 context-snapshot| Runtime
-  Runtime -->|事件 + snapshot| Analysis[ssr-question-analysis\n分析／多需求拆分]
-  Analysis -->|問題清單 + snapshot_id| Runtime
-  Runtime -->|各需求分開送出| Fanout{用途路由}
-  Fanout --> Weather[ssr-query-weather]
-  Fanout --> Person[ssr-query-person]
-  Fanout --> Game[ssr-query-game-info]
-  Fanout --> Guide[ssr-query-game-guide]
-  Fanout --> Item[ssr-query-game-item]
-  WeatherSource[天氣資料來源\n待選定] -->|查詢資料| Weather
-  PersonSource[人物資料來源\n待選定] -->|查詢資料| Person
-  Game --> Reader[ssr-knowledge-reader]
-  Guide --> Reader
-  Item --> Reader
-  Reader -->|讀取已發布版本| Published[ssr-knowledge-publish\n版本化材料來源]
-  Published -->|材料與來源| Reader
-  Weather -->|素材／來源／狀態| Runtime
-  Person -->|素材／來源／狀態| Runtime
-  Game -->|素材／來源／狀態| Runtime
-  Guide -->|素材／來源／狀態| Runtime
-  Item -->|素材／來源／狀態| Runtime
-  Runtime -->|缺口記錄；匯出機制待定| Gap[背景研究待處理缺口]
-  Runtime -->|同一 snapshot + 分析 + 全部查詢結果| AnswerContext[ssr-answer-context\n組裝 Prompt]
-  AnswerContext -->|Prompt| Model[ssr-model-client]
-  Model -->|生成文字| Runtime
-  Runtime --> Output[ssr-chat-output]
-  Output -->|文字訊息| Platform
-```
-
-### 前文與查詢資料回傳路徑
-
-1. `chat-input` 先保留原始輸入與驗證結果。無效輸入即送 SOP；有效標準事件才交 runtime 判斷觸發。事件與執行歷史分開記錄。
-2. runtime 呼叫 `conversation-context`；它讀 `conversation-store` 的聊天室事件，收到事件後建立 snapshot 並回傳 runtime。
-3. runtime 把這份 snapshot 傳給 question-analysis。分析輸出保留 `context_snapshot_id`。
-4. runtime 對每個拆出的需求呼叫獨立用途查詢器。遊戲資料查詢透過 knowledge-reader 讀取已發布版本；天氣與人物來源的實際存取方式尚未選定。
-5. 各查詢器只回 `materials`、`sources`、`status`。結果不直接回覆觀眾；runtime 將它們連同原 snapshot 與分析輸入交 answer-context。
-6. answer-context 組成 Prompt 後才交 model-client。此路徑讓前文和每項已讀材料都可追到 Prompt 輸入；查詢未命中／不可用狀態也會交給組裝端。
-
-`conversation-store` 的實際儲存位置、前文範圍、snapshot 是否含當前訊息、外部來源與發布材料的讀取協定均未選定。圖中發布來源與 query modules 代表邏輯邊界，並非共用資料庫或常駐服務承諾。
-
-## 背景知識資料流
+每筆事件先保留原始輸入及驗證結果。invalid、未觸發與 loop guard 事件進入固定 SOP 記錄，不直接丟棄，也不產生公開回答。
 
 ```mermaid
 flowchart LR
-  Wiki[Wiki／網路材料] --> Research[ssr-knowledge-research\n蒐集與查缺口]
-  Build[ssr-knowledge-build\n按道具／功能／攻略整理] --> Candidate[ssr-candidate-store\n未發布候選材料]
-  Research --> Build
-  FormalGaps[正式查詢缺口記錄] -->|離線匯出／匯入\n機制與版本待定| Research
-  Candidate -->|缺口補充：必須人工審核| Review[ssr-knowledge-review]
-  Review -->|通過| Publish[ssr-knowledge-publish\n版本化知識發布]
-  Candidate -.->|初次預建庫是否需審核：待決定| Publish
-  Publish -.->|被動提供已發布材料\n正式系統獨立讀取| Reader[ssr-knowledge-reader]
+    Platform[直播平台事件來源<br/>預留；目前用 fixture] --> Input[chat-input<br/>讀取文字事件]
+    Input --> Validate[必要欄位與來源驗證]
+    Validate --> RawStore[(聊天室原始事件紀錄<br/>raw event + validation)]
+    Validate --> Route{有效事件？}
+    Route -- 否 --> SOP[固定事件 SOP]
+    Trigger{觸發問答？} -->|否| SOP
+    Trigger -->|是| Runtime[chat-runtime]
+    Route -- 是 --> Trigger
+    SOP --> SopStore[(SOP 待處理記錄)]
+
+    Runtime -->|呼叫：conversation_id、current message_id| Context[conversation-context]
+    Context -->|讀前文| ConvStore[(conversation-store)]
+    ConvStore -->|有效的先前訊息| Context
+    Context -->|回傳 snapshot_id + messages| Runtime
+
+    Runtime -->|同一 snapshot| Analysis[question-analysis<br/>問題分析與多需求拆分]
+    Analysis -->|intents + query text| Runtime
+    Runtime -->|query text + 同一 snapshot| Weather[query-weather]
+    Runtime -->|query text + 同一 snapshot| Person[query-person]
+    Runtime -->|query text + 同一 snapshot| GameInfo[query-game-info]
+    Runtime -->|query text + 同一 snapshot| Guide[query-game-guide]
+    Runtime -->|query text + 同一 snapshot| Item[query-game-item]
+
+    Weather -->|status + materials + sources| QueryResults[各用途獨立查詢結果]
+    Person -->|status + materials + sources| QueryResults
+    GameInfo -->|status + materials + sources| QueryResults
+    Guide -->|status + materials + sources| QueryResults
+    Item -->|status + materials + sources| QueryResults
+    QueryResults --> Runtime
+
+    Runtime -->|同一 snapshot + query results| AnswerContext[answer-context<br/>組裝 Prompt]
+    Runtime -->|snapshot 前文| AnswerContext
+    Analysis -->|解析結果| AnswerContext
+    AnswerContext --> Model[model-client 介面<br/>目前 fixture model]
+    Model -->|生成文字| Output[chat-output<br/>目前 dry-run]
+    Output -->|目標：文字回答| PlatformOut[直播平台文字輸出<br/>尚未連線]
+
+    RawStore -. message_id .-> Trace[(問答執行 trace<br/>run_id + message_id)]
+    Runtime -->|run_id 關聯 message_id| Trace
+    QueryResults -->|no_data 的知識用途| Gaps[(缺口記錄<br/>run_id + message_id)]
 ```
 
-正式問答與背景作業是不同運作單位，不要求同時啟動，也不假設共享 DB。正式查詢發現材料不足時留下缺口，背景工作之後另行研究；缺口補充須人工審核才發布。初次預建庫的審核政策未決定。確切的問題匯出、候選材料格式、版本發布和正式讀取機制待定。
+`conversation-context` 的完整回程是 Runtime 呼叫 context、context 讀 conversation-store、store 回前文、context 回 snapshot 給 Runtime。Runtime 把同一 snapshot 交給分析與 answer-context；分析後的用途和各查詢素材也回到 answer-context，然後才送入模型。每個 query response 的最小內容是 `status`、`materials`、`sources`；診斷細節留在執行 trace。
 
-## 純版本化依賴圖
+聊天室原始事件、SOP、問答執行 trace、知識缺口是不同記錄。只有實際進入問答執行的事件有 `run_id`；執行 trace 以 `run_id` 連結對應的 `message_id`。SOP 處置細節仍待決定。
 
-以下只表示程式／契約依賴，不表示資料流、服務呼叫、同一部署或共用運行服務。箭頭方向為「左側 repo 依賴右側契約」，實際版本號與 package 管理方式待決定。
+### 背景知識流程
+
+知識準備是獨立系統，預建、缺口研究和工具設定不要求聊天 runtime 運行，也不假設共用資料庫。查詢正式回答時使用的材料可以來自本機 fixture；未來已發布知識如何交付給 query modules，尚未決定。
 
 ```mermaid
-flowchart BT
-  Contracts[ssr-data-contracts\n版本化 schema 套件]
-  subgraph Formal[正式 repo 契約依賴]
-    ChatInput[ssr-chat-input]
-    Runtime[ssr-chat-runtime]
-    Analysis[ssr-question-analysis]
-    Context[ssr-conversation-context]
-    AnswerContext[ssr-answer-context]
-    Output[ssr-chat-output]
-    Store[ssr-conversation-store]
-    SOP[ssr-event-sop]
-    Reader[ssr-knowledge-reader]
-    Weather[ssr-query-weather]
-    Person[ssr-query-person]
-    GameInfo[ssr-query-game-info]
-    Guide[ssr-query-game-guide]
-    Item[ssr-query-game-item]
-  end
-  subgraph Background[背景 repo 契約依賴]
-    Build[ssr-knowledge-build]
-    Research[ssr-knowledge-research]
-    Review[ssr-knowledge-review]
-    Publish[ssr-knowledge-publish]
-    Candidate[ssr-candidate-store]
-  end
-  subgraph Common[工程共用 repo]
-    Model[ssr-model-client]
-    Adapters[ssr-tool-adapters]
-  end
-  ChatInput --> Contracts
-  Runtime --> Contracts
-  Analysis --> Contracts
-  Context --> Contracts
-  AnswerContext --> Contracts
-  Output --> Contracts
-  Store --> Contracts
-  SOP --> Contracts
-  Reader --> Contracts
-  Weather --> Contracts
-  Person --> Contracts
-  GameInfo --> Contracts
-  Guide --> Contracts
-  Item --> Contracts
-  Build --> Contracts
-  Research --> Contracts
-  Review --> Contracts
-  Publish --> Contracts
-  Candidate --> Contracts
-  Model --> Contracts
-  Adapters --> Contracts
-  Assembly[ssr-system-assembly\n記錄版本相容組合] -.->|記錄目標組合，不是執行依賴| Contracts
+flowchart LR
+    OwnSources[自有道具、功能、攻略格式] --> Prebuild[預建整理]
+    WikiSources[Wiki / 網路材料<br/>人工蒐集；本機原型不連網] --> Prebuild
+    Prebuild --> PreCandidate[預建候選]
+
+    GapExport[問答缺口匯出<br/>run_id + message_id] -. 未決定的版本化交換 .-> GapImport[背景匯入缺口]
+    GapImport --> Research[另行研究、補來源]
+    Research --> GapCandidate[缺口補充候選]
+
+    PreCandidate --> Review[人工審核閘門]
+    GapCandidate -->|必須人工審核| Review
+    Review -->|核准 + 版本| Publish[知識發布]
+    Review -->|退回| CandidateStore[(候選記錄)]
+    PreCandidate --> CandidateStore
+    GapCandidate --> CandidateStore
+    Publish --> Versioned[版本化知識封裝<br/>本機 JSON 原型]
+    Versioned -. 交付/匯入方式待決定 .-> QueryModules[未來由查詢模組讀取<br/>非共享服務依賴]
+
+    ToolSources[固定用途工具清單] --> ToolPrep[工具設定準備<br/>僅文件與 fixture]
 ```
 
-`ssr-system-assembly` 描述版本組合與架構，不能因此推論它是 runtime。未來逐字稿兩個預留 repo 尚未建立，也未納入此目標圖。
+缺口補充候選必須人工審核後才能發布。預建內容是否一律人工審核尚待決定；本機原型先採人工審核的保守預設。工具設定目前只記錄用途，不執行工具、不儲存金鑰。版本封裝、匯入操作、相容政策和撤回方式未決定。
+
+## 預留 STT 資料路徑（尚未實作）
+
+```mermaid
+flowchart LR
+    Audio[主播語音] -. 未實作 .-> STT[STT source]
+    STT -. 帶時間範圍與來源 .-> TranscriptStore[(逐字稿記錄)]
+    Question[明確詢問：剛剛說了什麼？] -. 未實作 .-> TranscriptQuery[query-streamer-transcript]
+    TranscriptQuery -. 讀取 .-> TranscriptStore
+    TranscriptStore -. 帶來源與時間的片段 .-> TranscriptQuery
+    TranscriptQuery -. snapshot + materials + sources .-> Prompt[answer-context]
+    Ordinary[一般主播逐字稿] -. 不觸發回覆 .-> TranscriptStore
+    WakeWord[未來可能的明確喚醒詞] -. 規則待決 .-> TranscriptQuery
+```
+
+預留資料至少帶逐字稿來源與起訖時間。一般逐字稿只可保存/查詢，不會觸發回覆；明確喚醒詞、保留政策、來源及實作 repo 都待決定。此圖不是當前運行路徑。
+
+## 純 repo 依賴圖
+
+```mermaid
+flowchart TB
+    subgraph Chat[ssr-chat：正式問答]
+        ChatModules[repo 內部 modules]
+        ChatContracts[本 repo 契約副本與 fixture]
+        ChatLocal[標準函式庫與本 repo 本機檔案]
+        ChatModules --> ChatContracts
+        ChatModules --> ChatLocal
+    end
+    subgraph Knowledge[ssr-knowledge：背景準備]
+        KnowledgeModules[repo 內部 workflows]
+        KnowledgeContracts[本 repo 契約副本與 fixture]
+        KnowledgeLocal[標準函式庫與本 repo 本機檔案]
+        KnowledgeModules --> KnowledgeContracts
+        KnowledgeModules --> KnowledgeLocal
+    end
+    subgraph Assembly[ssr-system-assembly：規格]
+        Docs[架構與落地文件]
+        Schemas[本 repo schema 與範例]
+        Validator[本 repo 本機驗證器]
+        Validator --> Schemas
+        Validator --> Docs
+    end
+```
+
+三個 repo 之間沒有 import、檔案路徑、共用 runtime 或 DB 依賴。能力日後如需共用，使用已核准的版本化套件或資料封裝，不因此要求共用運行服務。契約副本獨立維護；修改時需在各 repo 各自更新和驗證。

@@ -1,0 +1,7 @@
+{
+  "sop_id": "sop-001",
+  "message_id": "message-invalid-001",
+  "reason": "source_not_allowed",
+  "raw_event": {"source": "untrusted-fixture", "text": "hello"},
+  "created_at": "2026-10-17T12:00:02Z"
+}

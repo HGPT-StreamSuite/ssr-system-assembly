@@ -1,0 +1,14 @@
+{
+  "implementation_status": "reserved_not_implemented",
+  "segment_id": "segment-001",
+  "transcript_id": "transcript-001",
+  "speaker_id": "streamer-001",
+  "text": "\u7a0d\u5f8c\u6703\u4ecb\u7d39\u661f\u7802\u7528\u9014\u3002",
+  "start_time": "2026-10-17T12:00:02Z",
+  "end_time": "2026-10-17T12:00:05Z",
+  "source": {
+    "source_id": "fixture-transcript",
+    "source_type": "stt_source",
+    "locator": "fixture://transcripts/001"
+  }
+}

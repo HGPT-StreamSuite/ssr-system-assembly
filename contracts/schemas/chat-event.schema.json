@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Raw chat text event",
+  "type": "object",
+  "required": ["conversation_id", "author_id", "source", "text"],
+  "properties": {
+    "message_id": {"type": "string"},
+    "conversation_id": {"type": "string"},
+    "author_id": {"type": "string"},
+    "source": {"type": "string"},
+    "text": {"type": "string"},
+    "created_at": {"type": "string"},
+    "is_self": {"type": "boolean"}
+  }
+}
