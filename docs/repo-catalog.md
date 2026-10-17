@@ -1,6 +1,6 @@
 # Repo 清單與責任邊界
 
-狀態欄代表本機草稿進度：**首批草稿**只適用於此 workspace 的兩個 repo；**藍圖**代表只列入系統規劃，尚未建立 repo。名稱與 repo 數以核心 23 個為準，兩個 STT repo 另列為預留項目。
+狀態欄代表落地進度：**首批已公開**表示 repo 已在 `HGPT-StreamSuite` 以 Public、`main` 建立；**藍圖**代表只列入系統規劃，尚未建立 repo。名稱與 repo 數以核心 23 個為準，兩個 STT repo 另列為預留項目。
 
 ## 正式問答系統（14）
 
@@ -39,8 +39,8 @@
 |---|---|---|
 | `ssr-model-client` | 封裝模型呼叫；供應商、API、重試及安全政策待定。 | 藍圖 |
 | `ssr-tool-adapters` | 封裝平台、網路來源與其他工具的 adapter；平台與協定待定。 | 藍圖 |
-| `ssr-data-contracts` | 共用且版本化的資料契約、schema、範例與驗證；不提供執行服務。 | 首批草稿 |
-| `ssr-system-assembly` | 保存 repo 藍圖、流程、版本相容組合及落地計畫；不提供執行服務。 | 首批草稿 |
+| `ssr-data-contracts` | 共用且版本化的資料契約、schema、範例與驗證；不提供執行服務。 | 首批已公開 |
+| `ssr-system-assembly` | 保存 repo 藍圖、流程、版本相容組合及落地計畫；不提供執行服務。 | 首批已公開 |
 
 ## 預留（不計入 23 個）
 

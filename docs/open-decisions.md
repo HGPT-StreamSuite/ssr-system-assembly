@@ -1,12 +1,11 @@
 # 待決策事項與未實作狀態
 
-目前只建立兩份本機草稿。下列項目沒有由文件推定為已核准的產品或基礎設施設計。
+首批兩份文件 repo 已在 `HGPT-StreamSuite` 公開發布。下列未決項目沒有由文件推定為已核准的產品或基礎設施設計。
 
 ## 權限與 repo 發布
 
-- GitHub organization 公開頁面可見，但顯示沒有公開 repos；未登入無法確認是否有私有 repo 或其他存取限制。
-- 兩個 repo 的遠端 visibility（公開／私有）尚待使用者決定；本次不建立遠端、不 push、不改權限或憑證。
-- 是否以 GitHub organization 作為新 repo 的 host、初始 repo 建立方式、branch protection 與套件發布流程尚未決定。
+- `ssr-data-contracts` 與 `ssr-system-assembly` 已建立為 `HGPT-StreamSuite` 的 Public repositories，初始提交已推送至 `main`。
+- 本次沒有建立其餘 blueprint repo；後續 repo 的可見性、建立順序、分支保護與套件發布流程尚未決定。
 
 ## 契約及流程語意
 
