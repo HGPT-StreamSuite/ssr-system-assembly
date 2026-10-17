@@ -1,15 +1,15 @@
 # 待決策事項與未實作狀態
 
-首批兩份文件 repo 已在 `HGPT-StreamSuite` 公開發布。下列未決項目沒有由文件推定為已核准的產品或基礎設施設計。
+首批兩份文件 repo 已在 HGPT-StreamSuite 公開發布。下列未決項目沒有由文件推定為已核准的產品或基礎設施設計。
 
 ## 權限與 repo 發布
 
-- `ssr-data-contracts` 與 `ssr-system-assembly` 已建立為 `HGPT-StreamSuite` 的 Public repositories，初始提交已推送至 `main`。
+- ssr-data-contracts 與 ssr-system-assembly 已建立為 HGPT-StreamSuite 的 Public repositories，初始提交已推送至 main。
 - 本次沒有建立其餘 blueprint repo；後續 repo 的可見性、建立順序、分支保護與套件發布流程尚未決定。
 
 ## 契約及流程語意
 
-- ID 的產生、去重、排序與追蹤政策；來源平台是否提供 ID、何時由 input 配發 `message_id`。
+- ID 的產生、去重、排序與追蹤政策；來源平台是否提供 ID、何時由 input 配發 message_id。
 - 來源允許清單、簽章／帳號驗證規則、必要欄位及無法正規化之原始 payload 保留政策。
 - 觸發條件、喚醒詞、問題拆分規則、固定 SOP 的內容與承接者。
 - 前文窗口長度、時間範圍、snapshot 是否包含當前訊息，以及資料保留／隱私政策。
@@ -18,13 +18,15 @@
 
 ## 執行與資料存放
 
-- 直播平台、模型供應商、遊戲資料來源、天氣來源、網路檢索來源與 credentials 均未選定或連接。
+- 直播平台、模型供應商、遊戲資料來源、天氣來源、人物來源、網路檢索來源與 credentials 均未選定或連接。
 - 資料庫、事件佇列、快取、部署環境、監控、告警、重試與安全限制均未指定；不假設共用 DB。
-- `conversation-store` 的儲存方式未選定。問答執行歷史與原始聊天室事件是分開的邏輯記錄，`run_id` 連結 `message_id`；執行歷史的持久化 repo／服務未指定。
-- knowledge publish 到正式 reader 的版本清單／傳輸機制，以及正式缺口到背景 research 的匯出／匯入機制尚未定義。
+- conversation-store 的儲存方式未選定。問答執行歷史與原始聊天室事件是分開的邏輯記錄，run_id 連結 message_id；執行歷史的持久化 repo／服務未指定。
+- knowledge publish 到正式 reader 的 artifact 格式、版本清單／傳輸機制，以及正式缺口到背景 research 的匯出／匯入機制尚未定義。
+- tool-adapters 的固定來源設定格式、介面版本策略、設定交付方式及 API／MCP 接入細節未定；沒有新增 credentials 或權限。
 
 ## 背景知識與預留能力
 
+- 預建知識、正式缺口補充、固定來源工具準備是可各自執行及平行安排的工作流；排程、編排與啟動方式尚未選定，不能據此推定為單一序列佇列。
 - 初次預建庫是否需人工審核尚未決定；正式查詢留下的缺口補充必須人工審核後才能發布。
 - 材料授權、可信來源、重複資料、更新週期與審核紀錄政策待定。
 - STT／主播逐字稿 source 和 query 皆未實作、未建 repo；未來逐字稿帶時間與來源，獨立供「剛剛說了什麼」等查詢。一般逐字稿不觸發回答，是否設計明確喚醒詞待定。
