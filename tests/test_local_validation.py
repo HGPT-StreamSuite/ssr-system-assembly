@@ -25,6 +25,14 @@ class LocalAssemblyValidationTests(unittest.TestCase):
         self.assertTrue(any("author_id: required" in error for error in errors))
         self.assertTrue(any("created_at: required" in error for error in errors))
 
+    def test_chat_event_requires_stable_message_id(self) -> None:
+        schema = load_json(ROOT / "contracts" / "schemas" / "chat-event.schema.json")
+        example = load_json(ROOT / "contracts" / "examples" / "chat-event.json")
+        self.assertEqual(validate_document(example, schema), [])
+        example.pop("message_id")
+        errors = validate_document(example, schema)
+        self.assertTrue(any("message_id: required" in error for error in errors))
+
     def test_query_contract_has_only_materials_sources_and_status(self) -> None:
         schema = load_json(ROOT / "contracts" / "schemas" / "query-result.schema.json")
         example = load_json(ROOT / "contracts" / "examples" / "query-result.json")

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Raw chat text event",
   "type": "object",
-  "required": ["conversation_id", "author_id", "source", "text"],
+  "required": ["message_id", "conversation_id", "author_id", "source", "text"],
   "properties": {
     "message_id": {"type": "string"},
     "conversation_id": {"type": "string"},

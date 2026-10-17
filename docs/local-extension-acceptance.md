@@ -22,6 +22,8 @@ flowchart LR
 
 原始事件先記錄，之後以 `source + conversation_id + message_id` 去重。重複事件保留在原始事件日誌並交給固定 SOP，不建立第二筆問答 run。已記錄事件可在重啟後重建去重索引；多程序同時寫入的原子性尚未實作。模型失敗會建立 run trace、寫入 SOP，且不呼叫輸出 adapter。輸出 adapter 例外時記錄 `delivery_state=unknown`，不自動重送。
 
+輸入缺少穩定 `message_id` 時不再生成隨機替代值，而是驗證失敗並進 SOP。問題分析以本機分隔符和關鍵字規則產生一項或多項 purpose-specific query text，再分別呼叫對應模組；它不是語意模型，未被分隔的多用途子句可能同時交給多個模組。
+
 ## 背景知識：獨立研究包與發布完整性
 
 ```mermaid

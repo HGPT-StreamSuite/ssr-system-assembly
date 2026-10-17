@@ -106,3 +106,4 @@ Schema 使用 JSON Schema 2020-12 常用結構。本 repo 標準函式庫驗證�
 - schemas/research-packet.schema.json 與 examples/research-packet.json 表示獨立離線研究包，保存 gap/run/message 關聯及素材來源。此契約不代表背景與正式問答共用資料庫或互相要求運行。
 - 已發布素材帶明確版本與 SHA-256 records 摘要；讀取端必須驗證發布狀態與摘要。摘要是完整性檢查，不是簽章或來源真實性證明。
 - 完整本地流程與失敗路徑見 [local-extension-acceptance.md](../docs/local-extension-acceptance.md)。
+- chat input 的 message_id 為必要穩定事件鍵；run trace 的 analysis 包含按用途拆分的 queries 計畫，query response 本身仍只含 status/materials/sources。

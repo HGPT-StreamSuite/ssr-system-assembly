@@ -3,7 +3,11 @@
   "message_id": "message-001",
   "context_snapshot_id": "snapshot-001",
   "run_status": "completed",
-  "analysis": {"intents": ["game_item"], "query_text": "\u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f"},
+  "analysis": {
+    "intents": ["game_item"],
+    "query_text": "\u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f",
+    "queries": [{"purpose": "game_item", "query_text": "\u9019\u500b\u9053\u5177\u600e\u9ebc\u7528\uff1f"}]
+  },
   "queries": [
     {"status": "no_data", "materials": [], "sources": []}
   ],
