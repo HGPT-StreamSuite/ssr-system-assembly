@@ -1,0 +1,276 @@
+{
+  "suite_version": "suite-v0.1.0",
+  "created": "2026-11-08",
+  "purpose": "第一份可運作元件版本組合：每個 repo 通過各自的程式測試後的 commit",
+  "method": "2026-11-06 獨立重跑驗收（Windows）＋ 2026-11-08 於乾淨 clone 重跑（Linux VM，Python 3.13.16、Node 22）",
+  "tag": "suite-v0.1.0（各 repo 的 annotated tag；與各 repo 自己的版本號分開，例如 hgpt-ssr-channel-events 已有 v0.1.0、v0.2.0）",
+  "not_covered": [
+    "真實瀏覽器驗收未通過任何一項",
+    "真實平台來源、真實 STT provider、HTTP 服務測試多數未執行",
+    "26 個 repo 未做同版整合封存（跨 repo 整合驗收尚未完成）",
+    "hgpt-ssr-manual-links 的 2026-11-06 重跑只有 Node 部分通過，2026-11-08 補驗通過程式與原生 CLI，仍無瀏覽器驗收",
+    "hgpt-ssr-channel-events 沒有網頁入口"
+  ],
+  "repos": [
+    {
+      "repo": "ssr-system-assembly",
+      "url": "https://github.com/HGPT-StreamSuite/ssr-system-assembly",
+      "visibility": "public",
+      "tested_commit": "e566f7b",
+      "main_commit": "(本 repo 中被標記 suite-v0.1.0 的 commit)",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 49（8 略過）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "ssr-data-contracts",
+      "url": "https://github.com/HGPT-StreamSuite/ssr-data-contracts",
+      "visibility": "public",
+      "tested_commit": "c853d22",
+      "main_commit": "c853d22",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Node 78（3 組檔案 11+42+25）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "ssr-chat",
+      "url": "https://github.com/HGPT-StreamSuite/ssr-chat",
+      "visibility": "public",
+      "tested_commit": "1c438ff",
+      "main_commit": "1d90c06",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 627，其中 2 組跨 repo 測試需完整 StreamSuite 目錄與正式 repo 對應，單獨 clone 跑不了；其餘通過",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit；快照後僅把證據檔的本機路徑改為佔位符"
+    },
+    {
+      "repo": "ssr-knowledge",
+      "url": "https://github.com/HGPT-StreamSuite/ssr-knowledge",
+      "visibility": "public",
+      "tested_commit": "54b0ef7",
+      "main_commit": "54b0ef7",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 162（8 略過）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "ssr-collector-peak",
+      "url": "https://github.com/HGPT-StreamSuite/ssr-collector-peak",
+      "visibility": "public",
+      "tested_commit": "ab148cb",
+      "main_commit": "ab148cb",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 88；Node 9",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-game-source-import",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-game-source-import",
+      "visibility": "private",
+      "tested_commit": "81a8b82",
+      "main_commit": "81a8b82",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 114（9 略過）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-game-store",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-game-store",
+      "visibility": "private",
+      "tested_commit": "e6bc32d",
+      "main_commit": "e6bc32d",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 147（14 略過）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-game-search",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-game-search",
+      "visibility": "private",
+      "tested_commit": "7c16515",
+      "main_commit": "7c16515",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 115（4 略過）；Node 1",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-channel-search",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-channel-search",
+      "visibility": "private",
+      "tested_commit": "c7d6e76",
+      "main_commit": "c7d6e76",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 172",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-chat-search",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-chat-search",
+      "visibility": "private",
+      "tested_commit": "a684dc8",
+      "main_commit": "a684dc8",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 163",
+      "note": "快照 8129242 之上多 1 個 commit（測試釘選與換行修正，程式碼未動）；乾淨 clone 163/163"
+    },
+    {
+      "repo": "hgpt-ssr-transcript-search",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-transcript-search",
+      "visibility": "private",
+      "tested_commit": "869600d",
+      "main_commit": "869600d",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 153",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-channel-store",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-channel-store",
+      "visibility": "private",
+      "tested_commit": "f448141",
+      "main_commit": "f448141",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 129；Node 36",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-identity-store",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-identity-store",
+      "visibility": "private",
+      "tested_commit": "3743a05",
+      "main_commit": "3743a05",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 71（6 略過）",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-chat-store",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-chat-store",
+      "visibility": "private",
+      "tested_commit": "6a87976",
+      "main_commit": "6a87976",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 112；Node 測試需專用 .test-output 環境，未在乾淨 clone 執行",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-stt-store",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-stt-store",
+      "visibility": "private",
+      "tested_commit": "13e432d",
+      "main_commit": "13e432d",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 131",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-channel-import",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-channel-import",
+      "visibility": "private",
+      "tested_commit": "ade8a95",
+      "main_commit": "ade8a95",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 84",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-chat-ingest",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-chat-ingest",
+      "visibility": "private",
+      "tested_commit": "f2557f5",
+      "main_commit": "f2557f5",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 92；Node 4",
+      "note": "快照 6c04195 之上多 2 個 commit（測試與換行修正，程式碼未動）；乾淨 clone 92/92"
+    },
+    {
+      "repo": "hgpt-stt-ingest",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-stt-ingest",
+      "visibility": "private",
+      "tested_commit": "b4d7cfa",
+      "main_commit": "b4d7cfa",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 102（4 略過）；Node 1",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-query-planner",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-query-planner",
+      "visibility": "private",
+      "tested_commit": "74de7c8",
+      "main_commit": "74de7c8",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 132",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-dispatcher",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-dispatcher",
+      "visibility": "private",
+      "tested_commit": "ecf07fb",
+      "main_commit": "ecf07fb",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 100；2 個 Node 測試在本環境失敗，原因未查，不計入",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-evidence-collector",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-evidence-collector",
+      "visibility": "private",
+      "tested_commit": "7b345a2",
+      "main_commit": "7b345a2",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 138（5 略過）；1 個 Node 測試需外部 fixture 參數，未執行",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-knowledge-drafts",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-knowledge-drafts",
+      "visibility": "private",
+      "tested_commit": "7f6d6b1",
+      "main_commit": "7f6d6b1",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 128",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-transcript-drafts",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-transcript-drafts",
+      "visibility": "private",
+      "tested_commit": "f73e0e6",
+      "main_commit": "f73e0e6",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 102",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    },
+    {
+      "repo": "hgpt-ssr-manual-links",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-manual-links",
+      "visibility": "private",
+      "tested_commit": "4fd5672",
+      "main_commit": "4fd5672",
+      "acceptance": "2026-11-08 補驗：Python 63/63、Node 25/25、原生 CLI 流程通過（乾淨 checkout）",
+      "clean_clone_tests": "Python 63；Node 25（原生 CLI 流程另行補驗通過）",
+      "note": "快照 c7351f2 之上多 1 個只改換行處理的 commit（4fd5672）；真實瀏覽器驗收仍未做"
+    },
+    {
+      "repo": "hgpt-ssr-channel-events",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-channel-events",
+      "visibility": "private",
+      "tested_commit": "f97c38d",
+      "main_commit": "f97c38d",
+      "acceptance": "2026-11-06 獨立重跑通過；缺網頁入口",
+      "clean_clone_tests": "Python 91；缺網頁入口",
+      "note": "驗收時工作樹乾淨"
+    },
+    {
+      "repo": "hgpt-ssr-activity-counts",
+      "url": "https://github.com/HGPT-StreamSuite/hgpt-ssr-activity-counts",
+      "visibility": "private",
+      "tested_commit": "68fc657",
+      "main_commit": "68fc657",
+      "acceptance": "2026-11-06 獨立重跑通過",
+      "clean_clone_tests": "Python 136",
+      "note": "驗收時工作樹未提交，通過狀態＝此快照 commit"
+    }
+  ]
+}
