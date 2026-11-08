@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>系統契約檢視台 · ssr-system-assembly</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">跳到主要操作</a>
+  <header class="topbar"><a class="brand" href="#workspace" aria-label="回到主要操作"><span class="brand-mark">A</span><span>STREAMSUITE <small>／ SYSTEM ASSEMBLY</small></span></a><span class="local-tag">僅限本機 · 唯讀驗證</span></header>
+  <main id="workspace">
+    <section class="hero" aria-labelledby="page-title">
+      <div><p class="eyebrow">REPOSITORY INSPECTOR / 02</p><h1 id="page-title">系統契約檢視台<span class="dot">.</span></h1><p class="intro">從合成輸入到驗證結果，逐項確認本 repo 的資料契約。<br>由既有 Python 驗證器執行，不需要其他 repo 或外部服務。</p></div>
+      <div class="hero-note"><span class="number" id="contract-count">—</span><span>組內建契約與範例</span><small id="connection-status" role="status">正在連線至本機驗證器…</small></div>
+    </section>
+    <div class="notice common-standard" role="status"><strong>共通門檻：使用者預設瀏覽器可實際開啟、操作並正常運作。</strong>本 repo 尚無真正瀏覽器證據，網頁驗收受阻。下方功能測例不能替代此門檻。</div>
+    <div class="notice"><strong>請只使用合成資料。</strong>不貼入真實聊天、帳號、私人記錄或憑證。輸入只在記憶體驗證，不保存、不對外傳送。</div>
+    <nav class="tabs" aria-label="檢視台頁面">
+      <button type="button" class="tab active" data-page="workbench" aria-current="page">01 驗證工作台</button>
+      <button type="button" class="tab" data-page="criteria">02 共用標準與測例</button>
+      <button type="button" class="tab" data-page="evidence">03 證據與版本</button>
+    </nav>
+
+    <section id="page-workbench" class="page" aria-label="驗證工作台">
+      <div class="workspace-grid">
+        <section class="panel input-panel" aria-labelledby="input-title">
+          <div class="panel-heading"><div><p class="eyebrow">INPUT</p><h2 id="input-title">選擇契約，放入 JSON</h2></div><span class="step">01</span></div>
+          <label for="schema-select">驗證契約</label><select id="schema-select" disabled><option>讀取中…</option></select>
+          <p id="schema-note" class="hint">只讀取本 repo 的 schemas 與 examples。</p>
+          <div class="editor-toolbar"><label for="json-input">合成 JSON 輸入</label><div><button type="button" id="load-example" class="text-button" disabled>載入範例</button><button type="button" id="format-input" class="text-button" disabled>格式化</button></div></div>
+          <textarea id="json-input" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="input-hint input-error" placeholder="啟動本機後端後，載入一組範例開始。" disabled></textarea>
+          <p id="input-hint" class="hint">上限 64 KiB UTF-8／32 層 JSON。Ctrl+Enter 可提交；切換契約會保留輸入。</p>
+          <p id="input-error" class="error-message" role="alert"></p>
+          <div class="actions"><button type="button" id="validate" class="primary" disabled>執行 Python 驗證 <span aria-hidden="true">↗</span></button><button type="button" id="cancel" class="secondary" disabled>取消等待</button><button type="button" id="clear" class="text-button" disabled>清空輸入</button></div>
+        </section>
+        <section class="panel output-panel" aria-labelledby="output-title" aria-busy="false" id="output-panel">
+          <div class="panel-heading"><div><p class="eyebrow">OUTPUT / FUNCTION CASE</p><h2 id="output-title">本次功能測例結果</h2></div><span id="result-badge" class="badge idle">尚未執行</span></div>
+          <div class="result-summary" aria-live="polite" aria-atomic="true"><div class="result-glyph" aria-hidden="true" id="result-glyph">→</div><h3 id="result-title">等待一份合成輸入</h3><p id="result-description">載入範例或編輯 JSON，再執行驗證。這裡只顯示實際回傳，不預先填入通過結果。</p></div>
+          <ul id="validation-errors" class="validation-errors"></ul>
+          <details id="response-details" hidden><summary>檢視完整 JSON 回傳與來源指紋</summary><pre id="result-json" tabindex="0"></pre></details>
+          <div class="scope-note"><strong>功能測例與瀏覽器驗收分開</strong><p>測例通過只表示符合有限 schema 欄位規則，不表示網頁已在使用者預設瀏覽器開啟並正常運作。資料真偽、日期語義、跨 repo 整合、模型與直播連線也未由此操作驗證。</p></div>
+        </section>
+      </div>
+      <section class="check-strip" aria-labelledby="repo-check-title"><div><h2 id="repo-check-title">檢查本 repo 內建範例</h2><p>實際呼叫 validate_repository：schema、範例、三 repo 清單與架構文字標記；不執行 unit tests。</p><p id="repo-check-status" role="status">尚未執行本次檢查。</p></div><button type="button" id="check-repo" class="secondary" disabled>執行範例檢查</button></section>
+      <details class="panel schema-panel"><summary>閱讀所選契約規格 <span>READ ONLY</span></summary><pre id="schema-json" tabindex="0">本機後端尚未連線。</pre></details>
+    </section>
+
+    <section id="page-criteria" class="page" aria-labelledby="criteria-title" hidden>
+      <div class="section-heading"><p class="eyebrow">SHARED BROWSER GATE / REPO CASES</p><h2 id="criteria-title">所有 repo 共通：預設瀏覽器可開啟運作</h2><p>必須在使用者預設瀏覽器實際看到頁面，操作適用的輸入、輸出與錯誤流程並留下證據。本 repo 的共通門檻適用；因前置步驟被拒，目前網頁驗收為 blocked。</p></div>
+      <h3>本 repo 功能測例</h3>
+      <div class="criteria-list">
+        <article><span>CASE-01 / 02</span><h3>來源與本機檢查</h3><p>記錄完整 HEAD、dirty、來源指紋、8 組 schema／範例及測試的命令、時間、輸出與 exit code。</p></article>
+        <article><span>CASE-03 / 04 / 05</span><h3>合成輸入與錯誤處理</h3><p>測試內建範例、缺少 message_id、不允許欄位、破損 JSON、未知契約、超大、過深及非有限數值。</p></article>
+        <article><span>CASE-06 / 07 / 08</span><h3>重送、取消與真正瀏覽器</h3><p>測試重送、取消後忽略過期回應及返回保留輸入。使用者預設瀏覽器的實際呈現、輸入輸出、窄視窗與鍵盤需分開實測；模擬 DOM 不算通過。</p></article>
+        <article><span>CASE-09 / 10</span><h3>隔離與版本證據</h3><p>檢查固定路徑、同來源 API 與版本匹配。功能測例 pass、過期紀錄、模擬、未測及不適用均不能變成共用驗收通過。</p></article>
+      </div>
+      <div class="panel prose">
+        <h3>已實際驗證結果</h3><p>在「證據與版本」頁查閱同版命令、合成輸入、實際輸出與測試模式。真正 Python、記憶體協定、模擬 DOM／transport、真實 HTTP 與預設瀏覽器證據分開列示。目前未啟動預設瀏覽器，沒有實際看見或操作頁面的紀錄。</p>
+        <h3>不適用及理由</h3><p>預設瀏覽器門檻適用於本 repo，不能列為不適用。直播輸出、LLM、正式 DB 寫入不由本 repo 提供；STT 只有預留契約，證據見 README、架構文件與契約。這些功能邊界不豁免獨立網頁的瀏覽器驗收。</p>
+        <h3>未測／阻塞</h3><p>loopback client connect 曾遭 WinError 10013，8872 埠盤點亦被拒。服務未啟動，沒有可用網址證據；使用者預設瀏覽器的真正呈現、輸入、輸出與錯誤流程未測。未換埠、工具、檔案網址或瀏覽器繞過。</p>
+        <h3>功能測例明細與操作說明</h3><p>下列文件保留具體輸入、輸出、邊界、隔離及證據要求，並記錄已定義的共通瀏覽器門檻與目前受阻狀態。</p><a class="document-link" href="/acceptance.md" target="_blank" rel="noopener">開啟 independent-acceptance.md ↗</a>
+        <h3>既有驗證器限制</h3><p>只支援 type、required、properties、items、enum、additionalProperties。空字串仍可能符合 string；日期時間、跨欄位一致性與來源真實性不在此 validator 的檢查範圍。這些限制不降低「預設瀏覽器可開啟運作」的共通門檻。</p>
+      </div>
+    </section>
+
+    <section id="page-evidence" class="page" aria-labelledby="evidence-title" hidden>
+      <div class="section-heading"><p class="eyebrow">EVIDENCE & PROVENANCE</p><h2 id="evidence-title">結果必須對得上版本</h2><p>目前來源由本機即時讀取。保存證據與當次手動驗證分開顯示；未收集或過期都不視為通過。</p></div>
+      <section class="panel provenance"><div class="panel-heading"><h3>目前來源</h3><button type="button" id="refresh-evidence" class="secondary" disabled>重新讀取證據</button></div><dl><dt>Repository</dt><dd>ssr-system-assembly</dd><dt>Branch</dt><dd id="source-branch">尚未取得</dd><dt>HEAD</dt><dd id="source-head">尚未取得</dd><dt>Dirty</dt><dd id="source-dirty">尚未取得</dd><dt>Source fingerprint</dt><dd id="source-fingerprint">尚未取得</dd></dl></section>
+      <section class="panel evidence-panel"><div class="panel-heading"><h3>功能測例實測紀錄</h3><span id="evidence-badge" class="badge idle">尚未讀取</span></div><p id="evidence-status" role="status">預設瀏覽器驗收受阻，沒有實際開啟及操作證據。連線成功後可讀取功能測例紀錄；測例 pass 不代表網頁驗收通過。</p><pre id="evidence-json" tabindex="0" hidden></pre></section>
+      <p><a class="document-link" href="/api/interface" target="_blank" rel="noopener">檢視固定 v1 接口與同次來源版本 ↗</a></p>
+      <div class="scope-note standalone"><strong>整體系統尚未由本頁驗收</strong><p>跨 repo、真實 provider、STT、正式資料與部署均不在此頁執行。原三 repo 藍圖與 26 repo 的整體分工仍需由總控對齊。</p></div>
+    </section>
+    <noscript><div class="notice">此頁需要 JavaScript 及本 repo 的本機 Python 後端；目前尚未執行網頁驗證。</div></noscript>
+  </main>
+  <footer><span>ssr-system-assembly</span><span>LOCAL INPUT · ACTUAL VALIDATION · TRACEABLE OUTPUT</span></footer>
+</body>
+</html>

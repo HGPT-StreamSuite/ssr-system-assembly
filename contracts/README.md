@@ -18,6 +18,9 @@
 
 Schema 使用 JSON Schema 2020-12 常用結構。本 repo 標準函式庫驗證器只實作 type、required、properties、items、enum 與 additionalProperties 子集；沒有宣稱完整 JSON Schema 相容。通過本機檢查表示範例符合這些欄位規則，不表示外部消費者已連線。
 
+規格先做結構檢查：不合法的 type／required／properties／items／enum、非 boolean 的 additionalProperties，以及不支援的驗證關鍵字（如 minLength、$ref、anyOf）會明確拒絕，不會忽略後回報通過。$schema、$id、$comment、title、description、default、examples 僅作註解，不會載入外部來源或套用預設值。schema 深度上限 64；JSON 非有限數值、空 schema/example 目錄與損壞文件也會回傳診斷。
+integer 接受無小數部分的有限數值（例如 1.0），但不接受 boolean。enum 依 JSON 值語意比較，包含巢狀 array/object；true 與 1 不相同，1 與 1.0 相同。type 與 enum 的重複宣告會明確拒絕。
+
 ## JSON 範例
 
 下列完整 JSON 文件存放在 `examples/`，可直接閱讀：

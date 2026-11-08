@@ -1,0 +1,81 @@
+{
+  "interface_version": "1",
+  "repo": "ssr-system-assembly",
+  "responsibility": "Repository-local schema, synthetic example and documentation validation. No chatbot, importer, reader, database or shared runtime service.",
+  "binding": {"host": "127.0.0.1", "default_port": 8872, "network_status": "blocked_not_verified", "writes_input": false},
+  "static_assets": ["/", "/app.js", "/styles.css", "/acceptance.md"],
+  "get_routes_support_head": true,
+  "unsupported_methods": "Unimplemented HTTP methods use the standard-library 501 response, outside the JSON API envelope; no operation is executed.",
+  "routes": [
+    {"method": "GET", "path": "/api/interface", "operation": "Read this fixed interface manifest with current source snapshot."},
+    {"method": "GET", "path": "/api/catalog", "operation": "Read built-in schema/example pairs; malformed local schemas are rejected."},
+    {"method": "GET", "path": "/api/evidence", "operation": "Read saved receipts, current source match and browser-gate status."},
+    {"method": "POST", "path": "/api/validate", "operation": "Validate a document against one fixed built-in schema ID."},
+    {"method": "POST", "path": "/api/check", "operation": "Validate this repository's schema/example set, catalog and architecture markers; body must be {}."}
+  ],
+  "validation_request_schema": {
+    "type": "object",
+    "required": ["schema_id", "document"],
+    "properties": {"schema_id": {"type": "string"}, "document": {}},
+    "additionalProperties": false
+  },
+  "validation_response_schema": {
+    "type": "object",
+    "required": ["api_version", "status", "schema_id", "errors", "error_count", "errors_truncated", "input_sha256", "mode", "assessment_scope", "request_id", "observed_utc", "snapshot", "common_standard"],
+    "properties": {
+      "api_version": {"type": "string", "enum": ["1"]},
+      "status": {"type": "string", "enum": ["pass", "fail"]},
+      "schema_id": {"type": "string"},
+      "errors": {"type": "array", "items": {"type": "string"}},
+      "error_count": {"type": "integer"},
+      "errors_truncated": {"type": "boolean"},
+      "input_sha256": {"type": "string"},
+      "mode": {"type": "string", "enum": ["local_python_schema_subset"]},
+      "assessment_scope": {"type": "string", "enum": ["repo_function_case_only"]},
+      "request_id": {"type": "string"},
+      "observed_utc": {"type": "string"},
+      "snapshot": {"type": "object"},
+      "common_standard": {"type": "object"}
+    },
+    "additionalProperties": false
+  },
+  "error_response_schema": {
+    "type": "object",
+    "required": ["api_version", "status", "error"],
+    "properties": {"api_version": {"type": "string", "enum": ["1"]}, "status": {"type": "string", "enum": ["error"]}, "error": {"type": "string"}},
+    "additionalProperties": false
+  },
+  "synthetic_request_example": {"schema_id": "query-result", "document": {"status": "no_data", "materials": [], "sources": []}},
+  "outcomes": {
+    "200": "Operation executed; status pass/fail describes local validation, not data truth or browser acceptance.",
+    "400": "Malformed JSON, request shape, framing, excessive depth or disallowed command/path/purpose/ACL fields.",
+    "403": "Invalid or duplicate Host/Origin; no authorization changes are performed.",
+    "404": "Unknown fixed route or schema ID, including unrecognized schema_id types.",
+    "411": "Missing Content-Length.",
+    "413": "Body exceeds 65536 bytes.",
+    "415": "Unsupported Content-Type.",
+    "500": "Invalid/unreadable local source; sanitized error, no traceback or private path in the response."
+  },
+  "limits": {"request_bytes": 65536, "request_depth": 32, "returned_errors": 100, "schema_depth": 64},
+  "browser_input_limit": "The JS editor rejects non-finite numbers and integer-valued numbers beyond Number.MAX_SAFE_INTEGER to avoid silently rounding synthetic IDs. Use string identity values. This does not narrow the native JSON/API numeric parser.",
+  "library": [
+    {"module": "tools/validate_local.py", "entry": "validate_document(value, schema, location='$')", "output": "list[str] diagnostics; [] means supported local rules matched; invalid schemas return diagnostics."},
+    {"module": "tools/validate_local.py", "entry": "validate_schema_shape(schema, location)", "output": "list[str] diagnostics for the supported subset; unsupported validation keywords are errors."},
+    {"module": "tools/validate_local.py", "entry": "validate_repository(root=ROOT)", "output": "list[str] repo diagnostics; root is trusted library/test configuration, never accepted from the web."},
+    {"module": "tools/local_inspector.py", "entry": "validate_input({schema_id, document})", "output": "validation_response_schema; RequestError carries a 400/404 status for invalid request shapes or IDs."}
+  ],
+  "cli": {"command": "python -I -S -B -X utf8 tools/validate_local.py", "input": "Fixed repository files only; no arbitrary path, command, endpoint or database arguments.", "exit_codes": {"0": "Local assertions passed.", "1": "Diagnostics printed as ERROR lines."}, "stdout": "Schema/example counts and local catalog/architecture result; not a system or browser acceptance verdict."},
+  "library_compatibility": "Only listed library entries are supported. Other adapter helpers are internal and do not define a cross-repo package interface.",
+  "semantics": {
+    "source_and_original_text": "Schema/examples are local fixtures. Sources/materials in query-result are objects without enforced inner provenance fields; validation does not authenticate the source or quote.",
+    "time": "Input timestamp fields are strings only; no UTC/range/ordering validation is implied. observed_utc in the result is validation time, not source event time.",
+    "identity_and_scope": "message/conversation/run/source IDs are opaque contract values. No cross-platform identity, authorization or database scope is inferred.",
+    "policy_acl_purpose": "No user-supplied ACL or purpose changes. Additional top-level execution/ACL/purpose/path fields are rejected; a purpose field inside a knowledge-gap document is only classification data, not an authorization grant. HTTP Host/Origin checks protect only the local inspector.",
+    "repeat_and_revision": "Read-only repeated input has a stable canonical input_sha256 and same assertions; request_id/time may differ. Revisions must be explicitly resubmitted; source changes invalidate old receipts.",
+    "version_binding": "Match exact HEAD, branch and source_fingerprint; api_version identifies this envelope, not the payload schema version or a global acceptance snapshot."
+  },
+  "dependencies": {"runtime": "Python 3.11+ standard library; same-repo validator and fixed files only.", "cross_repo_imports": false, "upstream_provider": "None at runtime.", "downstream_consumers": "No runtime consumer is wired here. ssr-chat/ssr-knowledge keep independent contract copies; coordination is required before any exchange."},
+  "module_boundaries": {"schema_engine": "tools/validate_local.py", "fixed_native_adapter": "tools/local_inspector.py", "presentation": "web/app.js and web/index.html", "receipts": "web/evidence.json and isolated .test-temp artifacts"},
+  "compatibility": "api_version is additive. Existing payload schemas are unchanged; no HGPT importer Evidence-to-reader Record transformation or shared schema is invented.",
+  "browser_gate": "Actual opening and operation in the user's default browser is required; currently blocked, not replaced by CLI, memory-handler or mock-DOM tests."
+}

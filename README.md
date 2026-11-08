@@ -35,3 +35,22 @@ python -m unittest discover -s tests -v
 
 ## 補充驗收
 本機去重、錯誤追蹤與獨立知識研究包契約見 [docs/local-extension-acceptance.md](docs/local-extension-acceptance.md)。
+
+## 獨立本機檢視網頁
+
+[共通瀏覽器門檻、功能測例與操作說明](docs/independent-acceptance.md)分列所有 repo 共通的「使用者預設瀏覽器可實際開啟、操作並正常運作」門檻、本 repo 功能測例、已實際驗證結果、不適用及理由、未測／阻塞。
+使用者已明訂上述共通門檻；本 repo 因先前 loopback 權限拒絕而缺少真正預設瀏覽器證據，網頁驗收為 blocked，不能宣告通過。程式、HTTP、後端或模擬 DOM 結果均不能替代真正瀏覽器驗收。
+網頁直接使用本 repo 的 Python 驗證器，可選擇 8 組內建合成範例、驗證自訂合成 JSON、檢查本 repo 範例與查閱版本證據。
+只用 Python 3.11+ 標準函式庫，不安裝依賴、不讀正式資料、不連外；網頁與 API 均不保存輸入。
+
+```powershell
+python -I -S -B -X utf8 tools/local_inspector.py
+```
+
+看到啟動訊息後開啟 `http://127.0.0.1:8872/`，在啟動終端按 Ctrl+C 停止。
+埠占用時不會自動換埠或停止其他程序。直接開啟 HTML 檔不能執行 Python 驗證，頁面會明確提示。
+UI 的「範例檢查」不執行 unittest；新增記憶體協定層測試併入上方 unittest 命令，前端狀態另可由既有 Node 執行 `node --test tests/test_inspector_ui.cjs`。
+實際 loopback HTTP 測試為 opt-in：只有權限問題已解除且獲准重新執行時才設 `ASSEMBLY_RUN_SOCKET_TESTS=1`；本輪曾遇 WinError 10013，未換埠或重試。
+這是本 repo 的檢視與驗證介面，不提供機器人 runtime、其他 repo 導覽、正式資料操作或部署。
+
+公開 CLI／library／固定 API 的系統性整理見 [docs/interfaces.md](docs/interfaces.md)，機器可讀 v1 格式與合成輸入見 [local-inspector.v1.json](contracts/interfaces/local-inspector.v1.json)。`GET /api/interface` 可回讀接口及同次來源 snapshot；API 包裝新增 api_version，不改既有 payload schema 或放寬來源綁定。真實 HTTP／預設瀏覽器仍受既有權限阻塞。
